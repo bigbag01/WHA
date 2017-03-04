@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-7-1 16:32:37 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="model.Activity" table="ACTIVITY">
+        <id name="aid" type="java.lang.Long">
+            <column name="AID" />
+            <generator class="increment" />
+        </id>
+        <many-to-one name="publisher" class="model.User" fetch="join">
+            <column name="PUBLISHER" />
+        </many-to-one>
+        <property name="sponsor" type="java.lang.String">
+            <column name="SPONSOR" />
+        </property>
+        <property name="head" type="java.lang.String">
+            <column name="HEAD" />
+        </property>
+        <property name="category" type="java.lang.Integer">
+        	<column name="CATEGORY"></column>
+        </property>
+        <property name="aplstart" type="java.util.Date">
+            <column name="APLSTART" />
+        </property>
+        <property name="aplend" type="java.util.Date">
+            <column name="APLEND" />
+        </property>
+        <property name="actstart" type="java.util.Date">
+            <column name="ACTSTART" />
+        </property>
+        <property name="actend" type="java.util.Date">
+            <column name="ACTEND" />
+        </property>
+        <property name="location" type="java.lang.String">
+            <column name="LOCATION" />
+        </property>
+        <property name="limitation" type="int">
+            <column name="LIMITATION" />
+        </property>
+        <property name="posterpath" type="java.lang.String">
+        	<column name="POSTERPATH"></column>
+        </property>
+        <property name="status" type="java.lang.String">
+            <column name="STATUS" />
+        </property>
+        <set name="users" table="apply" lazy="false">
+        	<key column="aid"></key>
+        	<many-to-many class="model.User" column="username"></many-to-many>
+        </set>
+        <!-- <set name="attenders" table="attend" lazy="false">
+        	<key column="aid"></key>
+        	<many-to-many class="model.User" column="username"></many-to-many>
+        </set> -->
+         <map name="ranks" table="RANKS" lazy="false">
+            <key>
+                <column name="AID" />
+            </key>
+            <map-key type="java.lang.String" column="USERNAME"></map-key>
+            <element type="java.lang.Integer">
+                <column name="RANK" />
+            </element>
+        </map>
+        <list name="keywords" table="KEYWORDS" lazy="false">  
+           <key column="AID" />  
+           <index column="listValue_id" /> 
+      	<element type="java.lang.String" column="KEYWORD" />  
+        </list>
+        <joined-subclass name="model.Activitycontent" table="activity_content">
+        	<key column="AID" />
+        	<property name="content" type="text"></property>
+        	<set name="comments" inverse="false" lazy="true">
+            <key>
+                <column name="AID" />
+            </key>
+            <one-to-many class="model.Message" />
+       		</set>
+        </joined-subclass>
+        
+    </class>
+</hibernate-mapping>

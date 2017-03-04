@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.objectFactory" value="spring"></constant>
+	<constant name="struts.i18n.encoding" value="utf-8"></constant>
+	<constant name="struts.multipart.saveDir" value="/tmp"/>
+	<constant name="struts.multipart.maxSize" value="10485760"/>
+	
+	<package name="my" namespace="/" extends="struts-default,json-default">
+		<interceptors>
+       	<!--判断是否登录 和 是否有访问权限  -->
+       	<interceptor name="auth" class="AuthInterceptor" />                
+       	</interceptors>
+      
+		<!--  全局结果 -->
+		<global-results>
+       		<!-- 拦截没登录返回结果 -->
+            <result name="noLogin" type="redirect">/nologin.jsp</result>
+            <!-- 拦截没有权限返回结果 -->
+            <result name="noPower" type="redirect">/tip.jsp</result>
+            <result name="noResource" type="redirect">/norsc.jsp</result>
+		</global-results>
+		
+
+       
+       <!--仅限管理员 -->
+		<action name="searchUserInfo" class="UserAction" method="searchInfo">
+			<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+		</action>
+        <action name="showAuth" class="UserAction" method="showAuth">
+       		<interceptor-ref name="auth"></interceptor-ref>
+        </action>
+        <action name="lockUser" class="UserAction" method="lockUser">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="redirect">usrmanagement.jsp</result>
+        </action>
+		<action name="waiting" class="ActivityAction" method="showWaiting">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<result name="success">/waiting.jsp</result>
+		</action>
+		<action name="pass" class="ActivityAction" method="pass">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="chain">waiting</result>
+       </action>
+       <action name="fail" class="ActivityAction" method="fail">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="chain">waiting</result>
+       </action>
+       <action name="rmvCmt" class="ActivityAction" method="removeComment">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="chain">showActDetail</result>
+       </action>
+      
+       <!--3级权限用户 -->
+       <action name="upActivity" class="ActivityAction" method="upactivity">
+      	 	<interceptor-ref name="defaultStack">  
+         		<param name="fileUpload.allowedTypes">image/png,image/gif,image/jpeg,image/jpg,image/x-png, image/pjpeg</param>  
+        		<param name="fileUpload.maximumSize">10485760</param> 
+        	</interceptor-ref> 
+        	<interceptor-ref name="auth"></interceptor-ref>
+        	<interceptor-ref name="params"/>
+       		<result name="success" type="chain">extractKey</result>
+       		<result name="error">/overdue.jsp</result>
+       		<result name="input">/user/pubact.jsp</result>
+       </action>
+       <action name="editActivity" class="ActivityAction" method="editActivity">
+       		<interceptor-ref name="defaultStack">  
+         		<param name="fileUpload.allowedTypes">image/png,image/gif,image/jpeg,image/jpg,image/x-png, image/pjpeg</param>  
+        		<param name="fileUpload.maximumSize">10485760</param> 
+        	</interceptor-ref> 
+        	<interceptor-ref name="auth"></interceptor-ref>
+        	<interceptor-ref name="params"/>
+       		<result name="success" type="chain">extractKey</result>
+       		<result name="input">/user/editact.jsp</result>
+       </action>
+       <action name="rmvAct" class="ActivityAction" method="removeActivity">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="redirect">index</result>
+       </action>
+       <action name="refuse" class="ApplyAction" method="refuse">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       
+       <!--2级及以上权限  -->
+       <action name="submitComment" class="ActivityAction" method="saveComment">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="chain">showActDetail</result>
+       </action>
+
+       
+       <!--1级及以上权限  -->
+       <action name="apply" class="ApplyAction" method="apply">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       <action name="cancel" class="ApplyAction" method="cancelApply">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       <action name="rate" class="ApplyAction" method="rate">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       <action name="invite" class="ActivityAction" method="invite">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="success" type="chain">showActDetail</result>
+       </action>
+       <action name="checkUser" class="UserAction" method="checkUser">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       <action name="showAppliers" class="ApplyAction" method="showAppliers">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+       
+      
+       
+       <!--登录即可 -->
+       <action name="editUser" class="UserAction" method="editUser">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result type="chain">showUserInfo</result>
+       </action>
+       <action name="showUserInfo" class="UserAction" method="showInfo">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       		<result name="error">/overdue.jsp</result>
+       		<result name="success">/user/userinfo.jsp</result>
+       </action>
+       <action name="showMyPub" class="ActivityAction" method="showMyPub">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<result name="success">/user/mypub.jsp</result>
+       </action>
+       <action name="showMyAttend" class="ActivityAction" method="showMyAttend">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<result name="success">/user/myattend.jsp</result>
+       </action>
+       <action name="showMyMessage" class="ActivityAction" method="showMyMessage">
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<result name="success">/user/message.jsp</result>
+       </action>
+       <action name="getMsg" class="ActivityAction" method="getBackMsg">
+       </action>
+       <action name="recommend" class="RecommendAction" method="calDist">
+       		<result name="success">/recommend.jsp</result>
+       		<interceptor-ref name="auth"></interceptor-ref>
+       		<interceptor-ref name="params"/>
+       </action>
+      
+       <!--无需权限，不登录也可  -->
+       <action name="register" class="UserAction" method="register">
+       </action>
+       <action name="login" class="UserAction" method="login">
+       </action>
+       <action name="logout" class="UserAction" method="logout">
+       		<result name="success" type="chain">index</result>
+       </action>
+       <action name="index" class="ActivityAction" method="showactivities">
+       		<result name="success">/index.jsp</result>
+       </action>
+       <action name="showActDetail" class="ActivityAction" method="showdetail">
+       		<result name="success" type="redirect">/activity.jsp</result>
+       		<result name="preview" type="redirect">/preview.jsp</result>
+       		<result name="editAct">/user/editact.jsp</result>
+       		<result name="input">/norsc.jsp</result>
+       </action>
+       <action name="searchAct" class="ActivityAction" method="searchActivity">
+       		<result name="success" type="redirect">/index.jsp</result>
+       </action>
+       <action name="listAct" class="ActivityAction" method="showactivities">
+       		<result name="success">/activitylist.jsp</result>
+       </action>
+
+       
+       
+       <action name="extractKey" class="RecommendAction" method="extract">
+       		<result name="success" type="chain">showActDetail</result>
+       </action>
+       
+    </package>
+
+</struts>

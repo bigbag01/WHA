@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-7-18 15:01:50 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="model.Lock" table="MYLOCK">
+        <id name="userName" type="java.lang.String">
+        	<column name="USERNAME"></column>
+            <generator class="foreign" >
+            	<param name="property">user</param>
+            </generator>
+        </id>
+<!--         <many-to-one name="user" class="model.User" unique="true">
+        	<column name="USERNAME"></column>
+        </many-to-one> -->
+        <one-to-one name="user" class="model.User"></one-to-one>
+        <property name="start" type="java.util.Date">
+            <column name="START" />
+        </property>
+        <property name="end" type="java.util.Date">
+            <column name="END" />
+        </property>
+        <property name="mid" type="java.lang.Long">
+        	<column name="MID"></column>
+        </property>
+        <property name="auth" type="java.lang.Integer">
+        	<column name="AUTH"></column>
+        </property>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-7-12 9:25:01 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="model.Message" table="MESSAGE">
+        <id name="mid" type="java.lang.Long">
+            <column name="MID" />
+            <generator class="increment" />
+        </id>
+        <property name="msg" type="text">
+            <column name="MSG" />
+        </property>
+        <many-to-one name="sender" class="model.User" fetch="join">
+            <column name="SENDER" />
+        </many-to-one>
+        <many-to-one name="receiver" class="model.User" fetch="join">
+            <column name="RECEIVER" />
+        </many-to-one>
+        <property name="time" type="java.util.Date">
+            <column name="TIME" />
+        </property>
+        <property name="myType" type="java.lang.String">
+        	<column name="MYTYPE" />
+        </property>
+        <many-to-one name="activity" class="model.Activity" fetch="join" lazy="false">
+        	<column name="AID" />
+        </many-to-one>
+    </class>
+</hibernate-mapping>
